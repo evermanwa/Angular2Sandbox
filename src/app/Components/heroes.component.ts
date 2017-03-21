@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { OnInit } from '@angular/core';
-import {Hero} from "./hero";
+import {Hero} from "../Data Objects/hero";
 import { Router } from '@angular/router';
-import {HeroService} from "./hero.service";
+import {HeroService} from "../Services/hero.service";
 
 const HEROES: Hero[] = [];
 
@@ -31,11 +31,30 @@ export class HeroesComponent implements OnInit {
   }
 
   getHeroes(): void{
-    this.heroService.getHeroesSlowly()
+    this.heroService.getHeroes()
       .then(data => {
-        this.heroes = data
+        this.heroes = data;
       });
   };
+
+  add(name: string): void{
+    name = name.trim();
+    if(!name){ return; }
+    this.heroService.create(name)
+      .then(hero => {
+        this.heroes.push(hero);
+        this.selectedHero = null;
+      })
+  }
+
+  delete(hero: Hero): void{
+    this.heroService
+      .delete(hero.id)
+      .then(() => {
+        this.heroes = this.heroes.filter(h => h!== hero);
+        if (this.selectedHero === hero){ this.selectedHero=null; }
+      });
+  }
 
   onSelect(hero: Hero): void {
     this.selectedHero = hero;
